@@ -1,6 +1,6 @@
 {
 
-    "name": "oat-sa/extension-experimental-workspace.git",
+    "name": "oat-sa/extension-experimental-workspace",
     "description" : "Supports workspaces for items",
     "type" : "tao-extension",
     "authors" : [
