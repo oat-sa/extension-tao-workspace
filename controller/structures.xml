@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE structures SYSTEM "../doc/structures.dtd">
+<structures>
+    <structure id="items" name="Items" level="0" group="main">
+        <sections>
+            <section id="manage_items" name="Manage items" url="">
+				<actions>
+					<action id="item-checkout" name="Check out" url="/taoWorkspace/Workspace/checkout" context="instance" group="content">
+					    <icon id="icon-repository"/>
+					</action>
+					<action id="item-checkin" name="Check in" url="/taoWorkspace/Workspace/checkin" context="instance" group="content">
+					    <icon id="icon-repository"/>
+					</action>
+				</actions>
+			</section>
+		</sections>
+	</structure>
+</structures>
