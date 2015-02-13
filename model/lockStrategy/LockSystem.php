@@ -29,6 +29,8 @@ use common_Utils;
 use oat\taoWorkspace\model\generis\WrapperModel;
 use \oat\tao\model\lock\LockSystem as LockSystemInterface;
 use oat\oatbox\Configurable;
+use oat\taoWorkspace\model\WorkspaceMap;
+use oat\taoRevision\helper\DeleteHelper;
 
 /**
  * Implements Lock using a basic property in the ontology storing the lock data
@@ -53,6 +55,7 @@ class LockSystem extends Configurable
         if (is_null($lock)) {
             $clone = $this->deepClone($resource);
             SqlStorage::add($ownerId, $resource, $clone);
+            WorkspaceMap::getCurrentUserMap()->reload();
         } elseif ($lock->getOwnerId() != $ownerId) {
             throw new ResourceLockedException($lock);
         }
@@ -81,11 +84,7 @@ class LockSystem extends Configurable
 	    if ($lock->getOwnerId() !== $ownerId) {
 	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lockdata->getOwnerId ());
 	    }
-
-	    $data = $this->applyData($lock->getWorkCopy(), $resource);
-	    SqlStorage::remove($ownerId, $resource);
-	    // persistence needs update
-	     
+	    $this->release($lock);
 	    return true;
 	}
 	
@@ -95,9 +94,11 @@ class LockSystem extends Configurable
     */
     public function forceReleaseLock(core_kernel_classes_Resource $resource)
     {
-        $copy = SqlStorage::getWorkCopy($resource);
-        $copy->delete();
-        parent::forceReleaseLock($resource);
+        $lock = $this->getLockData($resource);
+        if ($lock === false) {
+            return false;
+        }
+        $this->release($lock);
     }
     
     /**
@@ -110,6 +111,48 @@ class LockSystem extends Configurable
         return $this->getStorage()->getLock($resource);
     }
     
+    public function apply(core_kernel_classes_Resource $resource, $ownerId, $release = true)
+    {
+        $lock = $this->getLockData($resource);
+	    if ($lock === false) {
+	        return false;
+	    }
+	    if ($lock->getOwnerId() !== $ownerId) {
+	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lockdata->getOwnerId ());
+	    }
+	    
+	    $model = ModelManager::getModel();
+	    if (!$model instanceof WrapperModel) {
+	        throw new \common_exception_InconsistentData('Unexpected ontology model');
+	    }
+	    
+	    \common_Logger::i($lock->getWorkCopy()->getUri().' replaces '.$resource->getUri());
+	    
+	    $innerModel = $model->getInnerModel();
+	    $triples = $innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($resource);
+	    // bypasses the wrapper
+	    DeleteHelper::deepDeleteTriples($triples);
+	    
+	    $triples = $innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($lock->getWorkCopy());
+	    $clones = CloneHelper::deepCloneTriples($triples);
+	    
+	    foreach ($clones as $triple) {
+	        $triple->subject = $resource->getUri();
+	        \common_Logger::i($triple->subject.' '.$triple->predicate.' '.$triple->object);
+	        $innerModel->getRdfInterface()->add($triple);
+	    }
+
+	    if ($release) {
+	        $this->release($lock);
+	    }
+    }
+    
+    protected function release(Lock $lock) {
+        DeleteHelper::deepDelete($lock->getWorkCopy());
+        SqlStorage::remove($lock);
+        WorkspaceMap::getCurrentUserMap()->reload();
+    }
+    
     protected function deepClone(core_kernel_classes_Resource $source) {
         $clonedTriples = CloneHelper::deepCloneTriples($source->getRdfTriples());
         $newUri = common_Utils::getNewUri();
@@ -119,25 +162,5 @@ class LockSystem extends Configurable
             $rdfInterface->add($triple);
         }
         return new core_kernel_classes_Resource($newUri);
-    }
-    
-    protected function applyData(core_kernel_classes_Resource $source, core_kernel_classes_Resource $destination)
-    {
-        $model = ModelManager::getModel();
-        
-        if (!$model instanceof WrapperModel) {
-            throw new \common_exception_InconsistentData('Unexpected ontology model');
-        }
-        
-        \common_Logger::i($source->getUri().' replaces '.$destination->getUri());
-        
-        $innerModel = $model->getInnerModel();
-        $innerModel->getRdfsInterface()->getResourceImplementation()->delete($destination);
-        
-        foreach ($innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($source) as $triple) {
-            $triple->subject = $destination->getUri();
-            \common_Logger::i($triple->subject.' '.$triple->predicate.' '.$triple->object);
-            $innerModel->getRdfInterface()->add($triple);
-        }
     }
 }

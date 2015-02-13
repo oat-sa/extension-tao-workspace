@@ -23,15 +23,33 @@ namespace oat\taoWorkspace\model;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 class WorkspaceMap
 {
-    private $map;
+    private static $current = null;
     
     static public function getCurrentUserMap() {
         $user = \common_session_SessionManager::getSession()->getUser();
-        return new self($user->getIdentifier());
+        if (is_null(self::$current) || self::$current->getUserId() != $user->getIdentifier()) {
+            self::$current = new self($user->getIdentifier());
+        }
+        return self::$current;
     }
     
+    private $map;
+    
+    private $userId;
+    
     public function __construct($userId) {
+        $this->userId = $userId;
         $this->map = SqlStorage::getMap($userId);
+    }
+    
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+    
+    public function reload()
+    {
+        $this->map = SqlStorage::getMap($this->getUserId());
     }
     
     public function map(\core_kernel_classes_Resource $resource) {

@@ -73,10 +73,10 @@ class SqlStorage
 		$result = $persistence->exec($query,array($userId, $resource->getUri(), $copy->getUri(), time()));
     }
     
-    static public function remove($userId, core_kernel_classes_Resource $resource) {
+    static public function remove(Lock $lock) {
         $persistence = common_persistence_Manager::getPersistence('default');
         $query = 'DELETE FROM "'.self::TABLE_NAME.'" WHERE "'.self::FIELD_OWNER.'" = ? AND "'.self::FIELD_RESOURCE.'" = ?';
-        $result = $persistence->exec($query,array($userId, $resource->getUri()));
+        $result = $persistence->exec($query,array($lock->getOwnerId(), $lock->getResource()->getUri()));
     }
 
     /**
