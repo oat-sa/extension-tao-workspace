@@ -43,9 +43,6 @@ return array(
             'oat\\taoWorkspace\\' => dirname(__FILE__).DIRECTORY_SEPARATOR
         )
     ),
-    'routes' => array(
-        '/taoWorkspace' => 'oat\\taoWorkspace\\controller'
-    ),    
 	'constants' => array(
 	    # views directory
 	    "DIR_VIEWS" => dirname(__FILE__).DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR,
