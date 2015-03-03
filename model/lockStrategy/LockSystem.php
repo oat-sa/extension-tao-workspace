@@ -120,25 +120,20 @@ class LockSystem extends Configurable
 	    if ($lock->getOwnerId() !== $ownerId) {
 	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lockdata->getOwnerId ());
 	    }
-	    
-	    $model = ModelManager::getModel();
-	    if (!$model instanceof WrapperModel) {
-	        throw new \common_exception_InconsistentData('Unexpected ontology model');
-	    }
-	    
-	    \common_Logger::i($lock->getWorkCopy()->getUri().' replaces '.$resource->getUri());
-	    
-	    $innerModel = $model->getInnerModel();
+
+	    \common_Logger::i('Applying changes to '.$resource->getUri());
+	     
+	    $innerModel = $this->getInnerModel();
 	    $triples = $innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($resource);
 	    // bypasses the wrapper
 	    DeleteHelper::deepDeleteTriples($triples);
 	    
-	    $triples = $innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($lock->getWorkCopy());
+	    $triples = $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->getRdfTriples($lock->getWorkCopy());
 	    $clones = CloneHelper::deepCloneTriples($triples);
 	    
 	    foreach ($clones as $triple) {
+	        $triple->modelid = $innerModel->getNewTripleModelId();
 	        $triple->subject = $resource->getUri();
-	        \common_Logger::i($triple->subject.' '.$triple->predicate.' '.$triple->object);
 	        $innerModel->getRdfInterface()->add($triple);
 	    }
 
@@ -148,7 +143,11 @@ class LockSystem extends Configurable
     }
     
     protected function release(Lock $lock) {
-        DeleteHelper::deepDelete($lock->getWorkCopy());
+        $workcopy = $lock->getWorkCopy();
+        // deletes the dependencies
+        DeleteHelper::deepDelete($workcopy);
+        // deletes the workcopy
+        $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->delete($workcopy);
         SqlStorage::remove($lock);
         WorkspaceMap::getCurrentUserMap()->reload();
     }
@@ -156,11 +155,44 @@ class LockSystem extends Configurable
     protected function deepClone(core_kernel_classes_Resource $source) {
         $clonedTriples = CloneHelper::deepCloneTriples($source->getRdfTriples());
         $newUri = common_Utils::getNewUri();
-        $rdfInterface = ModelManager::getModel()->getRdfInterface();
+        
+        $wsModel = $this->getWorkspaceModel();
+        $rdfInterface = $wsModel->getRdfInterface();
         foreach ($clonedTriples as $triple) {
             $triple->subject = $newUri;
+            $triple->modelid = $wsModel->getNewTripleModelId();
             $rdfInterface->add($triple);
         }
         return new core_kernel_classes_Resource($newUri);
+    }
+
+    /**
+     * 
+     * @throws \common_exception_InconsistentData
+     * @return oat\generis\model\data\Model
+     */
+    private function getInnerModel() {
+        $model = ModelManager::getModel();
+        if (!$model instanceof WrapperModel) {
+            throw new \common_exception_InconsistentData('Unexpected ontology model');
+        }
+        return $model->getInnerModel();
+    }
+    
+    /**
+     * 
+     * @throws \common_exception_InconsistentData
+     * @return \core_kernel_persistence_smoothsql_SmoothModel
+     */
+    private function getWorkspaceModel() {
+        $model = ModelManager::getModel();
+        if (!$model instanceof WrapperModel) {
+            throw new \common_exception_InconsistentData('Unexpected ontology model '.get_class($model));
+        }
+        $wsModel = $model->getWorkspaceModel();
+        if (!$wsModel instanceof \core_kernel_persistence_smoothsql_SmoothModel) {
+            throw new \common_exception_InconsistentData('Unexpected workspace model'.get_class($wsModel));
+        } 
+        return $wsModel;
     }
 }

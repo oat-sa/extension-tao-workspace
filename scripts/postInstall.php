@@ -26,7 +26,15 @@ use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 
 SqlStorage::createTable();
 
-$wrapedModel = WrapperModel::wrap(ModelManager::getModel());
+$code = 666;
+$workspaceModel = new \core_kernel_persistence_smoothsql_SmoothModel(array(
+    \core_kernel_persistence_smoothsql_SmoothModel::OPTION_PERSISTENCE => 'default',
+    \core_kernel_persistence_smoothsql_SmoothModel::OPTION_READABLE_MODELS => array($code),
+    \core_kernel_persistence_smoothsql_SmoothModel::OPTION_WRITEABLE_MODELS => array($code),
+    \core_kernel_persistence_smoothsql_SmoothModel::OPTION_NEW_TRIPLE_MODEL => $code
+));
+
+$wrapedModel = WrapperModel::wrap(ModelManager::getModel(), $workspaceModel);
 ModelManager::setModel($wrapedModel);
 
 LockManager::setImplementation(new LockSystem());

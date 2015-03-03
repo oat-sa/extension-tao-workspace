@@ -35,11 +35,8 @@ class WrapperModel extends Configurable
     implements Model
 {
     
-    static public function wrap(Model $model) {
-        return new self(array('inner' => array(
-        	'class' => get_class($model),
-            'config' => $model->getOptions()
-        )));
+    static public function wrap(Model $original, Model $workspace) {
+        return new self(array('inner' => $original, 'workspace' => $workspace));
     }
     
     /**
@@ -67,16 +64,18 @@ class WrapperModel extends Configurable
         $inner = $this->getInnerModel();
         
         $this->rdf = $inner->getRdfInterface();
-        $this->rdfs = new WrapperRdfs($inner->getRdfsInterface());
+        $this->rdfs = new WrapperRdfs($inner->getRdfsInterface(), $this->getWorkspaceModel()->getRdfsInterface());
     }
     
     /**
      * @return Model
      */
     public function getInnerModel() {
-        $inner = $this->getOption('inner');
-        $innerClass = $inner['class'];
-        return new $innerClass($inner['config']);
+        return $this->getOption('inner');
+    }
+    
+    public function getWorkspaceModel() {
+        return $this->getOption('workspace');
     }
     
     /**

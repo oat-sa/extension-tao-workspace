@@ -46,8 +46,8 @@ class WrapperRdfs
     private $property;
     
     
-    public function __construct(RdfsInterface $inner) {
-        $this->resource = new WrapperResource($inner->getResourceImplementation());
+    public function __construct(RdfsInterface $inner, RdfsInterface $workSpaceRdfs) {
+        $this->resource = new WrapperResource($inner->getResourceImplementation(), $workSpaceRdfs->getResourceImplementation());
         $this->class = $inner->getClassImplementation();
         $this->property = $inner->getPropertyImplementation();
     }

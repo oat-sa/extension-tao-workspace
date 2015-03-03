@@ -42,10 +42,13 @@ class WrapperResource
      */
     private $inner;
     
+    private $workspace;
+    
     private $mapper;
     
-    public function __construct(core_kernel_persistence_ResourceInterface $inner) {
+    public function __construct(core_kernel_persistence_ResourceInterface $inner, core_kernel_persistence_ResourceInterface $workspace) {
         $this->inner = $inner;
+        $this->workspace = $workspace;
         $this->mapper = WorkspaceMap::getCurrentUserMap();
     }
     
@@ -55,7 +58,7 @@ class WrapperResource
      */
     public function getTypes(core_kernel_classes_Resource $resource)
     {
-        return $this->inner->getTypes($this->mapResource($resource));
+        return $this->getModelForResource($resource)->getTypes($this->mapResource($resource));
     }
 
     /**
@@ -64,7 +67,7 @@ class WrapperResource
      */
     public function getPropertyValues(core_kernel_classes_Resource $resource,  core_kernel_classes_Property $property, $options = array())
     {
-        return $this->inner->getPropertyValues($this->mapResource($resource), $property, $options);
+        return $this->getModelForResource($resource)->getPropertyValues($this->mapResource($resource), $property, $options);
     }
 
     /**
@@ -73,7 +76,7 @@ class WrapperResource
      */
     public function getPropertyValuesByLg(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property, $lg)
     {
-        return $this->inner->getPropertyValuesByLg($this->mapResource($resource), $property, $lg);
+        return $this->getModelForResource($resource)->getPropertyValuesByLg($this->mapResource($resource), $property, $lg);
     }
 
     /**
@@ -82,7 +85,7 @@ class WrapperResource
      */
     public function setPropertyValue(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property, $object, $lg = null)
     {
-        return $this->inner->setPropertyValue($this->mapResource($resource), $property, $object, $lg);
+        return $this->getModelForResource($resource)->setPropertyValue($this->mapResource($resource), $property, $object, $lg);
     }
 
     /**
@@ -91,7 +94,7 @@ class WrapperResource
      */
     public function setPropertiesValues(core_kernel_classes_Resource $resource, $properties)
     {
-        return $this->inner->setPropertiesValues($this->mapResource($resource), $properties);
+        return $this->getModelForResource($resource)->setPropertiesValues($this->mapResource($resource), $properties);
     }
 
     /**
@@ -100,7 +103,7 @@ class WrapperResource
      */
     public function setPropertyValueByLg(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property, $value, $lg)
     {
-        return $this->inner->setPropertyValueByLg($this->mapResource($resource), $property, $value, $lg);
+        return $this->getModelForResource($resource)->setPropertyValueByLg($this->mapResource($resource), $property, $value, $lg);
     }
 
     /**
@@ -109,7 +112,7 @@ class WrapperResource
      */
     public function removePropertyValues(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property, $options = array())
     {
-        return $this->inner->removePropertyValues($this->mapResource($resource), $property, $options);
+        return $this->getModelForResource($resource)->removePropertyValues($this->mapResource($resource), $property, $options);
     }
 
     /**
@@ -118,7 +121,7 @@ class WrapperResource
      */
     public function removePropertyValueByLg(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property, $lg, $options = array())
     {
-        return $this->inner->removePropertyValueByLg($this->mapResource($resource), $property, $lg, $options);
+        return $this->getModelForResource($resource)->removePropertyValueByLg($this->mapResource($resource), $property, $lg, $options);
     }
 
     /**
@@ -127,7 +130,7 @@ class WrapperResource
      */
     public function getRdfTriples(core_kernel_classes_Resource $resource)
     {
-        return $this->inner->getRdfTriples($this->mapResource($resource));
+        return $this->getModelForResource($resource)->getRdfTriples($this->mapResource($resource));
     }
 
     /**
@@ -136,7 +139,7 @@ class WrapperResource
      */
     public function getUsedLanguages(core_kernel_classes_Resource $resource, core_kernel_classes_Property $property)
     {
-        return $this->inner->getUsedLanguages($this->mapResource($resource), $property);
+        return $this->getModelForResource($resource)->getUsedLanguages($this->mapResource($resource), $property);
     }
 
     /**
@@ -145,7 +148,7 @@ class WrapperResource
      */
     public function duplicate(core_kernel_classes_Resource $resource, $excludedProperties = array())
     {
-        return $this->inner->duplicate($this->mapResource($resource), $excludedProperties);
+        return $this->getModelForResource($resource)->duplicate($this->mapResource($resource), $excludedProperties);
     }
 
     /**
@@ -154,7 +157,7 @@ class WrapperResource
      */
     public function delete(core_kernel_classes_Resource $resource, $deleteReference = false)
     {
-        return $this->inner->delete($this->mapResource($resource), $deleteReference);
+        return $this->getModelForResource($resource)->delete($this->mapResource($resource), $deleteReference);
     }
 
     /**
@@ -163,7 +166,7 @@ class WrapperResource
      */
     public function getPropertiesValues(core_kernel_classes_Resource $resource, $properties)
     {
-        return $this->inner->getPropertiesValues($this->mapResource($resource), $properties);
+        return $this->getModelForResource($resource)->getPropertiesValues($this->mapResource($resource), $properties);
     }
 
     /**
@@ -172,7 +175,7 @@ class WrapperResource
      */
     public function setType(core_kernel_classes_Resource $resource, core_kernel_classes_Class $class)
     {
-        return $this->inner->setType($this->mapResource($resource), $class);
+        return $this->getModelForResource($resource)->setType($this->mapResource($resource), $class);
     }
 
     /**
@@ -181,7 +184,16 @@ class WrapperResource
      */
     public function removeType(core_kernel_classes_Resource $resource, core_kernel_classes_Class $class)
     {
-        return $this->inner->removeType($this->mapResource($resource), $class);
+        return $this->getModelForResource($resource)->removeType($this->mapResource($resource), $class);
+    }
+    
+    private function getModelForResource(core_kernel_classes_Resource $resource)
+    {
+        if ($this->mapResource($resource)->equals($resource)) {
+            return $this->inner;
+        } else {
+            return $this->workspace;
+        }
     }
     
     /**
