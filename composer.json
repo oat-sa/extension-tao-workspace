@@ -1,6 +1,6 @@
 {
 
-    "name": "oat-sa/extension-experimental-workspace",
+    "name": "oat-sa/extension-tao-workspace",
     "description" : "Supports workspaces for items",
     "type" : "tao-extension",
     "authors" : [
