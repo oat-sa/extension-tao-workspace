@@ -31,6 +31,7 @@ use \oat\tao\model\lock\LockSystem as LockSystemInterface;
 use oat\oatbox\Configurable;
 use oat\taoWorkspace\model\WorkspaceMap;
 use oat\taoRevision\helper\DeleteHelper;
+use oat\taoRevision\model\workspace\ApplicableLock;
 
 /**
  * Implements Lock using a basic property in the ontology storing the lock data
@@ -39,7 +40,7 @@ use oat\taoRevision\helper\DeleteHelper;
  * Also if you nevertheless call it statically you may want to avoid the late static binding for the getLockProperty
  */
 class LockSystem extends Configurable
-    implements LockSystemInterface
+    implements LockSystemInterface, ApplicableLock
 {
     public function getStorage() {
         return new SqlStorage();
