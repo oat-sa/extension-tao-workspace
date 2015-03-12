@@ -93,5 +93,9 @@ class WrapperModel extends Configurable
     public function getRdfsInterface() {
         return $this->rdfs;
     }
+    
+    public function getReadableModels() {
+        return $this->getInnerModel()->getReadableModels();
+    }
 
 }
