@@ -99,7 +99,7 @@ class LockSystem extends Configurable
         if ($lock === false) {
             return false;
         }
-        $this->release($lock);
+        return $this->release($lock);
     }
     
     /**
@@ -151,6 +151,7 @@ class LockSystem extends Configurable
         $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->delete($workcopy);
         SqlStorage::remove($lock);
         WorkspaceMap::getCurrentUserMap()->reload();
+        return true;
     }
     
     protected function deepClone(core_kernel_classes_Resource $source) {
