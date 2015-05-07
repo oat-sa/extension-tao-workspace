@@ -20,10 +20,9 @@
 
 namespace oat\taoWorkspace\model\lockStrategy;
 
+use oat\tao\model\lock\ResourceLockedException;
 use oat\taoRevision\helper\CloneHelper;
 use core_kernel_classes_Resource;
-use core_kernel_classes_Class;
-use core_kernel_classes_Property;
 use oat\generis\model\data\ModelManager;
 use common_Utils;
 use oat\taoWorkspace\model\generis\WrapperModel;
@@ -83,7 +82,7 @@ class LockSystem extends Configurable
 	        return false;
 	    }
 	    if ($lock->getOwnerId() !== $ownerId) {
-	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lockdata->getOwnerId ());
+	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lock->getOwnerId ());
 	    }
 	    $this->release($lock);
 	    return true;
@@ -119,7 +118,7 @@ class LockSystem extends Configurable
 	        return false;
 	    }
 	    if ($lock->getOwnerId() !== $ownerId) {
-	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lockdata->getOwnerId ());
+	        throw new \common_exception_Unauthorized ( "The resource is owned by " . $lock->getOwnerId ());
 	    }
 
 	    \common_Logger::i('Applying changes to '.$resource->getUri());
