@@ -82,7 +82,7 @@ class LockSystem extends Configurable
 	        return false;
 	    }
 	    if ($lock->getOwnerId() !== $ownerId) {
-	        throw new common_exception_Unauthorized ( "The resource is owned by " . $lock->getOwnerId ());
+	        throw new \common_exception_Unauthorized ( "The resource is owned by " . $lock->getOwnerId ());
 	    }
 	    $this->release($lock);
 	    return true;
