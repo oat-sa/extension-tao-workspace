@@ -20,10 +20,11 @@
 namespace oat\taoWorkspace\model\generis;
 
 use oat\generis\model\data\Model;
+use common_Logger;
 use \common_exception_MissingParameter;
 use \common_exception_Error;
-use oat\generis\model\kernel\persistence\file\FileRdf;
 use oat\oatbox\Configurable;
+use oat\generis\model\data\ModelManager;
 
 /**
  * transitory model for the smooth sql implementation
@@ -63,18 +64,20 @@ class WrapperModel extends Configurable
         
         $inner = $this->getInnerModel();
         
-        $this->rdf = $inner->getRdfInterface();
+        $this->rdf = new WrapperRdf($inner->getRdfInterface(), $this);
         $this->rdfs = new WrapperRdfs($inner->getRdfsInterface(), $this->getWorkspaceModel()->getRdfsInterface());
     }
     
     /**
      * @return Model
      */
-    public function getInnerModel() {
+    public function getInnerModel()
+    {
         return $this->getOption('inner');
     }
     
-    public function getWorkspaceModel() {
+    public function getWorkspaceModel()
+    {
         return $this->getOption('workspace');
     }
     
@@ -82,7 +85,8 @@ class WrapperModel extends Configurable
      * (non-PHPdoc)
      * @see \oat\generis\model\data\Model::getRdfInterface()
      */
-    public function getRdfInterface() {
+    public function getRdfInterface()
+    {
         return $this->rdf;
     }
     
@@ -90,12 +94,22 @@ class WrapperModel extends Configurable
      * (non-PHPdoc)
      * @see \oat\generis\model\data\Model::getRdfsInterface()
      */
-    public function getRdfsInterface() {
+    public function getRdfsInterface()
+    {
         return $this->rdfs;
     }
     
-    public function getReadableModels() {
+    public function getReadableModels()
+    {
         return $this->getInnerModel()->getReadableModels();
     }
 
+    public function addReadableModel($modelId)
+    {
+        common_Logger::i('Adding model '.$modelId.' via wrapper');
+        $this->getInnerModel()->addReadableModel($modelId);
+        
+        // update in persistence
+        ModelManager::setModel($this);
+    }
 }
