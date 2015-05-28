@@ -31,6 +31,7 @@ use oat\oatbox\Configurable;
 use oat\taoWorkspace\model\WorkspaceMap;
 use oat\taoRevision\helper\DeleteHelper;
 use oat\taoRevision\model\workspace\ApplicableLock;
+use oat\tao\model\lock\ResourceLockedException;
 
 /**
  * Implements Lock using a basic property in the ontology storing the lock data
