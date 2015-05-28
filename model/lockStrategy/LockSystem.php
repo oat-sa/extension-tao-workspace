@@ -20,7 +20,6 @@
 
 namespace oat\taoWorkspace\model\lockStrategy;
 
-use oat\tao\model\lock\ResourceLockedException;
 use oat\taoRevision\helper\CloneHelper;
 use core_kernel_classes_Resource;
 use oat\generis\model\data\ModelManager;
