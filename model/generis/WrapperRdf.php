@@ -58,7 +58,7 @@ class WrapperRdf
      */
     public function get($subject, $predicate)
     {
-        $this->inner->get($subject, $predicate);
+        return $this->inner->get($subject, $predicate);
     }
     
     /**
@@ -76,7 +76,7 @@ class WrapperRdf
      */
     public function search($predicate, $object)
     {
-        $this->inner->search($predicate, $object);
+        return $this->inner->search($predicate, $object);
     }
     
     /**
@@ -84,6 +84,6 @@ class WrapperRdf
      * @see IteratorAggregate::getIterator()
      */
     public function getIterator() {
-        $this->inner->getIterator();
+        return $this->inner->getIterator();
     }
 }
