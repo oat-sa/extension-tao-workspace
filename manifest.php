@@ -24,7 +24,7 @@ return array(
 	'label' => 'Workspace',
 	'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '0.1',
+    'version' => '0.2',
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array('taoItems' => '>=2.6.3','taoRevision' => '>=1.0'),
 	'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager',
@@ -38,6 +38,7 @@ return array(
     ),
     'uninstall' => array(
     ),
+    'update' => 'oat\\taoWorkspace\\scripts\\update\\Updater',
     'autoload' => array (
         'psr-4' => array(
             'oat\\taoWorkspace\\' => dirname(__FILE__).DIRECTORY_SEPARATOR
