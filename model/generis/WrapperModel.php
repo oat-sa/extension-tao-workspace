@@ -23,8 +23,8 @@ use oat\generis\model\data\Model;
 use common_Logger;
 use \common_exception_MissingParameter;
 use \common_exception_Error;
-use oat\oatbox\Configurable;
 use oat\generis\model\data\ModelManager;
+use oat\oatbox\service\ConfigurableService;
 
 /**
  * transitory model for the smooth sql implementation
@@ -32,7 +32,7 @@ use oat\generis\model\data\ModelManager;
  * @author joel bout <joel@taotesting.com>
  * @package generis
  */
-class WrapperModel extends Configurable
+class WrapperModel extends ConfigurableService
     implements Model
 {
     
