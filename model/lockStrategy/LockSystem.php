@@ -78,7 +78,7 @@ class LockSystem extends Configurable
 	public function releaseLock(core_kernel_classes_Resource $resource, $ownerId)
 	{
 	    $lock = $this->getLockData($resource);
-	    if ($lock === false) {
+	    if (is_null($lock) || ($lock === false)) {
 	        return false;
 	    }
 	    if ($lock->getOwnerId() !== $ownerId) {
