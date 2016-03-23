@@ -23,6 +23,9 @@ use oat\generis\model\data\ModelManager;
 use oat\tao\model\lock\LockManager;
 use oat\taoWorkspace\model\generis\WrapperModel;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
+use oat\oatbox\service\ServiceManager;
+use oat\taoRevision\model\Repository;
+use oat\taoWorkspace\model\RevisionWrapper;
 
 SqlStorage::createTable();
 
@@ -39,3 +42,9 @@ ModelManager::setModel($wrapedModel);
 
 LockManager::setImplementation(new LockSystem());
 
+$serviceManager = ServiceManager::getServiceManager();
+$oldRepository = $serviceManager->get(Repository::SERVICE_ID);
+$serviceManager->register('taoWorkspace/innerRevision', $oldRepository);
+
+$newService = new RevisionWrapper(array(RevisionWrapper::OPTION_INNER_IMPLEMENTATION => 'taoWorkspace/innerRevision'));
+$serviceManager->register(Repository::SERVICE_ID, $newService);

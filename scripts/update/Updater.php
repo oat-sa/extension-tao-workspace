@@ -20,6 +20,8 @@
  */
 namespace oat\taoWorkspace\scripts\update;
 
+use oat\taoRevision\model\Repository;
+use oat\taoWorkspace\model\RevisionWrapper;
 /**
  * 
  * @author Joel Bout <joel@taotesting.com>
@@ -36,6 +38,15 @@ class Updater extends \common_ext_ExtensionUpdater
     {
         if ($this->isBetween('0', '0.2')){
             $this->setVersion('0.2');
+        }
+        
+        if ($this->isVersion('0.2')) { 
+            $oldRepository = $this->getServiceManager()->get(Repository::SERVICE_ID);
+            $this->getServiceManager()->register('taoWorkspace/innerRevision', $oldRepository);
+            
+            $newService = new RevisionWrapper(array(RevisionWrapper::OPTION_INNER_IMPLEMENTATION => 'taoWorkspace/innerRevision'));
+            $this->getServiceManager()->register(Repository::SERVICE_ID, $newService);
+            $this->setVersion('0.3.0');
         }
     }
 }

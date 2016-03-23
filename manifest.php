@@ -24,9 +24,12 @@ return array(
 	'label' => 'Workspace',
 	'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '0.2',
+    'version' => '0.3.0',
 	'author' => 'Open Assessment Technologies SA',
-	'requires' => array('taoItems' => '>=2.6.3','taoRevision' => '>=1.0'),
+	'requires' => array(
+        'taoItems' => '>=2.6.3',
+        'taoRevision' => '>=2.0'
+	),
 	'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager', array('ext'=>'taoWorkspace')),
@@ -36,14 +39,7 @@ return array(
             dirname(__FILE__).DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'postInstall.php'
         )
     ),
-    'uninstall' => array(
-    ),
     'update' => 'oat\\taoWorkspace\\scripts\\update\\Updater',
-    'autoload' => array (
-        'psr-4' => array(
-            'oat\\taoWorkspace\\' => dirname(__FILE__).DIRECTORY_SEPARATOR
-        )
-    ),
 	'constants' => array(
 	    # views directory
 	    "DIR_VIEWS" => dirname(__FILE__).DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR,
