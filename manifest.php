@@ -28,7 +28,7 @@ return array(
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
         'taoItems' => '>=2.6.3',
-        'taoRevision' => '>=2.0'
+        'taoRevision' => '>=2.0.1'
 	),
 	'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager',
     'acl' => array(
