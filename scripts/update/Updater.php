@@ -48,5 +48,7 @@ class Updater extends \common_ext_ExtensionUpdater
             $this->getServiceManager()->register(Repository::SERVICE_ID, $newService);
             $this->setVersion('0.3.0');
         }
+
+        $this->skip('0.3.0', '0.3.1');
     }
 }
