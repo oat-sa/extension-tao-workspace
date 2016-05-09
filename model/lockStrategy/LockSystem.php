@@ -143,13 +143,18 @@ class LockSystem extends Configurable
     }
     
     protected function release(Lock $lock) {
-        $workcopy = $lock->getWorkCopy();
+
+        $workCopy = $lock->getWorkCopy();
+
         // deletes the dependencies
-        DeleteHelper::deepDelete($workcopy);
-        // deletes the workcopy
-        $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->delete($workcopy);
+        DeleteHelper::deepDelete($workCopy, $this->getWorkspaceModel());
+
+        // deletes the workCopy
+        $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->delete($workCopy);
+
         SqlStorage::remove($lock);
         WorkspaceMap::getCurrentUserMap()->reload();
+
         return true;
     }
     
