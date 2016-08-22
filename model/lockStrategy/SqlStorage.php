@@ -51,6 +51,9 @@ class SqlStorage
         }
     }
     
+    /**
+     * @return \common_persistence_SqlPersistence
+     */
     public function getPersistence() {
         return common_persistence_Manager::getPersistence('default');
     }
