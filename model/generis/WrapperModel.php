@@ -68,6 +68,24 @@ class WrapperModel extends ConfigurableService
         $this->rdfs = new WrapperRdfs($inner->getRdfsInterface(), $this->getWorkspaceModel()->getRdfsInterface());
     }
     
+    function getResource($uri) {
+        $resource = new \core_kernel_classes_Resource($uri);
+        $resource->setModel($this);
+        return $resource;
+    }
+
+    function getClass($uri) {
+        $class = new \core_kernel_classes_Class($uri);
+        $class->setModel($this);
+        return $class;
+    }
+
+    function getProperty($uri) {
+        $property = new \core_kernel_classes_Property($uri);
+        $property->setModel($this);
+        return $property;
+    }
+
     /**
      * @return Model
      */
