@@ -30,7 +30,7 @@ return array(
     'requires' => array(
         'generis' => '>=3.1.0',
         'taoItems' => '>=2.6.3',
-        'taoRevision' => '>=2.2.1'
+        'taoRevision' => '>=2.2.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager',
     'acl' => array(
