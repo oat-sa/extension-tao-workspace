@@ -67,7 +67,7 @@ class WrapperModel extends ConfigurableService
         $property->setModel($this);
         return $property;
     }
-
+    
     /**
      * @return Model
      */
@@ -108,6 +108,10 @@ class WrapperModel extends ConfigurableService
         return $this->rdfs;
     }
     
+    public function getSearchInterface() {
+        return $this->getInnerModel()->getSearchInterface();
+    }
+
     public function getReadableModels()
     {
         return $this->getInnerModel()->getReadableModels();
