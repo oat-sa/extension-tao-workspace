@@ -19,6 +19,7 @@
  * 
  */               
 use oat\taoWorkspace\scripts\uninstall\UninstallWorkspace;
+use oat\taoWorkspace\scripts\install\SetupWrapper;
 
 return array(
     'name' => 'taoWorkspace',
@@ -38,7 +39,7 @@ return array(
     ),
     'install' => array(
         'php' => array(
-            dirname(__FILE__).DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'postInstall.php'
+            SetupWrapper::class
         )
     ),
     'uninstall' => array(
