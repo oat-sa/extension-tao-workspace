@@ -21,6 +21,7 @@
 namespace oat\taoWorkspace\scripts\update;
 
 use oat\taoRevision\model\Repository;
+use oat\taoRevision\model\RepositoryService;
 use oat\taoWorkspace\model\RevisionWrapper;
 /**
  * 
@@ -30,9 +31,9 @@ class Updater extends \common_ext_ExtensionUpdater
 {
 
     /**
-     * 
-     * @param string $currentVersion
-     * @return string $versionUpdatedTo
+     *
+     * @param string $initialVersion
+     * @return void
      */
     public function update($initialVersion)
     {
@@ -50,5 +51,14 @@ class Updater extends \common_ext_ExtensionUpdater
         }
 
         $this->skip('0.3.0', '0.4.1');
+
+        if ($this->isVersion('0.4.1')) {
+
+            $service = $this->getServiceManager()->get(Repository::SERVICE_ID);
+            $service->setOption(RepositoryService::OPTION_FS, 'revisions');
+            $this->getServiceManager()->register(Repository::SERVICE_ID, $service);
+
+            $this->setVersion('0.5.0');
+        }
     }
 }
