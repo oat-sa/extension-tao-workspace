@@ -28,6 +28,7 @@ use oat\taoWorkspace\model\generis\WrapperModel;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 use oat\taoRevision\model\Repository;
 use oat\taoWorkspace\model\RevisionWrapper;
+use oat\taoRevision\model\RepositoryService;
 
 /**
  * @author Joel Bout <joel@taotesting.com>
@@ -55,7 +56,10 @@ class SetupWrapper extends InstallAction
         $oldRepository = $this->getServiceManager()->get(Repository::SERVICE_ID);
         $this->registerService('taoWorkspace/innerRevision', $oldRepository);
 
-        $newService = new RevisionWrapper(array(RevisionWrapper::OPTION_INNER_IMPLEMENTATION => 'taoWorkspace/innerRevision'));
+        $newService = new RevisionWrapper(array(
+            RevisionWrapper::OPTION_INNER_IMPLEMENTATION => 'taoWorkspace/innerRevision',
+            RepositoryService::OPTION_FS => 'revisions'
+        ));
         $this->registerService(Repository::SERVICE_ID, $newService);
     }
 }
