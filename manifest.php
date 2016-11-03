@@ -19,13 +19,14 @@
  * 
  */               
 use oat\taoWorkspace\scripts\uninstall\UninstallWorkspace;
+use oat\taoWorkspace\scripts\install\SetupWrapper;
 
 return array(
     'name' => 'taoWorkspace',
     'label' => 'Workspace',
     'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '0.5.0',
+    'version' => '0.6.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'generis' => '>=3.1.0',
@@ -38,7 +39,7 @@ return array(
     ),
     'install' => array(
         'php' => array(
-            dirname(__FILE__).DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'postInstall.php'
+            SetupWrapper::class
         )
     ),
     'uninstall' => array(
