@@ -20,12 +20,13 @@
  */
 namespace oat\taoWorkspace\scripts\update;
 
-use common_ext_Extension;
-use common_ext_ExtensionsManager;
 use common_ext_ExtensionUpdater;
+use core_kernel_persistence_smoothsql_SmoothModel;
+use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
 use oat\taoRevision\model\RepositoryService;
+use oat\taoWorkspace\model\generis\WrapperModel;
 use oat\taoWorkspace\model\RevisionWrapper;
 /**
  * 
@@ -68,7 +69,7 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('0.5.0', '0.6.0');
         
         if ($this->isVersion('0.6.0')) {
-            /* @var $modelWrapper \oat\taoWorkspace\model\generis\WrapperModel */
+            /* @var $modelWrapper WrapperModel */
             $modelWrapper = ModelManager::getModel();
             
             $inner = $modelWrapper->getInnerModel();
@@ -77,7 +78,7 @@ class Updater extends common_ext_ExtensionUpdater
             $workspace = $modelWrapper->getWorkspaceModel();
             $workspace->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
             
-            $wrapedModel = WrapperModel::wrap($model, $workspaceModel );
+            $wrapedModel = WrapperModel::wrap($inner, $workspace );
             $wrapedModel->setServiceLocator($this->getServiceManager());
             ModelManager::setModel($wrapedModel);
             
