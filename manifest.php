@@ -26,10 +26,10 @@ return array(
     'label' => 'Workspace',
     'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '0.6.0',
+    'version' => '0.6.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'generis' => '>=3.1.0',
+        'generis' => '>=3.8.3',
         'taoItems' => '>=2.6.3',
         'taoRevision' => '>=2.2.0'
     ),

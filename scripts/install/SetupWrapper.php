@@ -20,15 +20,17 @@
  */
 namespace oat\taoWorkspace\scripts\install;
 
-use oat\oatbox\extension\InstallAction;
-use oat\taoWorkspace\model\lockStrategy\LockSystem;
+use core_kernel_persistence_smoothsql_SmoothModel;
 use oat\generis\model\data\ModelManager;
+use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
+use oat\oatbox\extension\InstallAction;
 use oat\tao\model\lock\LockManager;
-use oat\taoWorkspace\model\generis\WrapperModel;
-use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 use oat\taoRevision\model\Repository;
-use oat\taoWorkspace\model\RevisionWrapper;
 use oat\taoRevision\model\RepositoryService;
+use oat\taoWorkspace\model\generis\WrapperModel;
+use oat\taoWorkspace\model\lockStrategy\LockSystem;
+use oat\taoWorkspace\model\lockStrategy\SqlStorage;
+use oat\taoWorkspace\model\RevisionWrapper;
 
 /**
  * @author Joel Bout <joel@taotesting.com>
@@ -40,14 +42,18 @@ class SetupWrapper extends InstallAction
         SqlStorage::createTable();
 
         $code = 666;
-        $workspaceModel = new \core_kernel_persistence_smoothsql_SmoothModel(array(
-            \core_kernel_persistence_smoothsql_SmoothModel::OPTION_PERSISTENCE => 'default',
-            \core_kernel_persistence_smoothsql_SmoothModel::OPTION_READABLE_MODELS => array($code),
-            \core_kernel_persistence_smoothsql_SmoothModel::OPTION_WRITEABLE_MODELS => array($code),
-            \core_kernel_persistence_smoothsql_SmoothModel::OPTION_NEW_TRIPLE_MODEL => $code
+        $workspaceModel = new core_kernel_persistence_smoothsql_SmoothModel(array(
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_PERSISTENCE => 'default',
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_READABLE_MODELS => array($code),
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_WRITEABLE_MODELS => array($code),
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_NEW_TRIPLE_MODEL => $code,
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE => ComplexSearchService::SERVICE_ID,
         ));
-
-        $wrapedModel = WrapperModel::wrap(ModelManager::getModel(), $workspaceModel);
+        
+        $model = ModelManager::getModel();
+        $model->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
+        
+        $wrapedModel = WrapperModel::wrap($model, $workspaceModel );
         $wrapedModel->setServiceLocator($this->getServiceLocator());
         ModelManager::setModel($wrapedModel);
 
