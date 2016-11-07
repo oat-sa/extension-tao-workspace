@@ -62,5 +62,14 @@ class Updater extends \common_ext_ExtensionUpdater
         }
         
         $this->skip('0.5.0', '0.6.0');
+        
+        if ($this->isVersion('0.6.0')) {
+
+            $service = $this->getServiceManager()->get('generis/ontology');
+            $service->setOption('search', 'generis/complexSearch');
+            $this->getServiceManager()->register('generis/ontology', $service);
+
+            $this->setVersion('0.6.1');
+        }
     }
 }

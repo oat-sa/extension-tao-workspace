@@ -47,7 +47,7 @@ class SetupWrapper extends InstallAction
             \core_kernel_persistence_smoothsql_SmoothModel::OPTION_NEW_TRIPLE_MODEL => $code
         ));
 
-        $wrapedModel = WrapperModel::wrap(ModelManager::getModel(), $workspaceModel);
+        $wrapedModel = WrapperModel::wrap(ModelManager::getModel(), $workspaceModel , 'generis/complexSearch');
         $wrapedModel->setServiceLocator($this->getServiceLocator());
         ModelManager::setModel($wrapedModel);
 

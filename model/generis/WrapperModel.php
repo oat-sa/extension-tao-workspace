@@ -36,8 +36,8 @@ class WrapperModel extends ConfigurableService
     implements Model
 {
     
-    static public function wrap(Model $original, Model $workspace) {
-        return new self(array('inner' => $original, 'workspace' => $workspace));
+    static public function wrap(Model $original, Model $workspace , $searchService) {
+        return new self(array('inner' => $original, 'workspace' => $workspace , 'search' => $searchService ));
     }
     
     /**
