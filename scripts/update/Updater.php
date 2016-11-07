@@ -68,14 +68,19 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('0.5.0', '0.6.0');
         
         if ($this->isVersion('0.6.0')) {
-            /* @var $extension common_ext_Extension */
-            $extension = common_ext_ExtensionsManager::singleton()->getExtensionById('generis');
-            $config = $extension->getConfig('ontology');
+            /* @var $modelWrapper \oat\taoWorkspace\model\generis\WrapperModel */
+            $modelWrapper = ModelManager::getModel();
             
-            $config['inner']['search']     = ComplexSearchService::SERVICE_ID ;
-            $config['workspace']['search'] = ComplexSearchService::SERVICE_ID ;
+            $inner = $modelWrapper->getInnerModel();
+            $inner->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
             
-            $extension->setConfig('ontology', $config);
+            $workspace = $modelWrapper->getWorkspaceModel();
+            $workspace->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
+            
+            $wrapedModel = WrapperModel::wrap($model, $workspaceModel );
+            $wrapedModel->setServiceLocator($this->getServiceManager());
+            ModelManager::setModel($wrapedModel);
+            
             $this->setVersion('0.6.1');
         }
     }
