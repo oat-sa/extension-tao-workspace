@@ -20,6 +20,10 @@
  */
 namespace oat\taoWorkspace\scripts\update;
 
+use common_ext_Extension;
+use common_ext_ExtensionsManager;
+use common_ext_ExtensionUpdater;
+use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
 use oat\taoRevision\model\RepositoryService;
 use oat\taoWorkspace\model\RevisionWrapper;
@@ -27,7 +31,7 @@ use oat\taoWorkspace\model\RevisionWrapper;
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-class Updater extends \common_ext_ExtensionUpdater
+class Updater extends common_ext_ExtensionUpdater
 {
 
     /**
@@ -64,11 +68,14 @@ class Updater extends \common_ext_ExtensionUpdater
         $this->skip('0.5.0', '0.6.0');
         
         if ($this->isVersion('0.6.0')) {
-
-            $service = $this->getServiceManager()->get('generis/ontology');
-            $service->setOption('search', 'generis/complexSearch');
-            $this->getServiceManager()->register('generis/ontology', $service);
-
+            /* @var $extension common_ext_Extension */
+            $extension = common_ext_ExtensionsManager::singleton()->getExtensionById('generis');
+            $config = $extension->getConfig('ontology');
+            
+            $config['inner']['search']     = ComplexSearchService::SERVICE_ID ;
+            $config['workspace']['search'] = ComplexSearchService::SERVICE_ID ;
+            
+            $extension->setConfig('ontology', $config);
             $this->setVersion('0.6.1');
         }
     }
