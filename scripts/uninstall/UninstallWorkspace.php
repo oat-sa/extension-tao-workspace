@@ -60,9 +60,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
         $this->registerService(Repository::SERVICE_ID, $innerStore);
         $this->getServiceManager()->unregister($innerKey);
 
-        $method = new \ReflectionMethod(get_class($lock->getStorage()),'getPersistence');
-        $method->setAccessible(true);
-        $storageSql = $method->invoke($lock->getStorage());
+        $storageSql = $lock->getStorage()->getPersistence();
 
         $this->registerService(LockSystemInterface::SERVICE_ID, new NoLock());
         $storageSql->exec('DROP TABLE workspace');
@@ -76,9 +74,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
      */
     protected function releaseAll(LockSystem $lockService)
     {
-        $method = new \ReflectionMethod(get_class($lockService->getStorage()),'getPersistence');
-        $method->setAccessible(true);
-        $sql = $method->invoke($lockService->getStorage());
+        $sql = $lockService->getStorage()->getPersistence();
 
         $result = $sql->query('SELECT '.SqlStorage::FIELD_OWNER.','.SqlStorage::FIELD_RESOURCE.' FROM '.SqlStorage::TABLE_NAME);
         $locked = $result->fetchAll(\PDO::FETCH_ASSOC);

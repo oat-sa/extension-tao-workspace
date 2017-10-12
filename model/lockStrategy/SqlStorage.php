@@ -62,7 +62,7 @@ class SqlStorage extends ConfigurableService
     /**
      * @return \common_persistence_SqlPersistence
      */
-    private static function getPersistence()
+    public static function getPersistence()
     {
         if (!self::$persistence) {
             $self = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
