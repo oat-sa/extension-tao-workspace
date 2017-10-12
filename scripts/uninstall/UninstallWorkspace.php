@@ -35,7 +35,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
 
     public function __invoke($params)
     {
-        $lock = $this->getServiceManager()->get(LockSystemInterface::SERVICE_ID);
+        $lock = $this->getServiceManager()->get(LockSystemInterface::SERVICE_ID)->getConfig();
         if (!$lock instanceof LockSystem) {
             throw new \common_exception_InconsistentData('Expected Workspace Lock not found, found '.get_class($lock));
         }
@@ -61,6 +61,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
         $this->getServiceManager()->unregister($innerKey);
 
         $storageSql = $lock->getStorage()->getPersistence();
+
         $this->registerService(LockSystemInterface::SERVICE_ID, new NoLock());
         $storageSql->exec('DROP TABLE workspace');
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Successfully removed workspace wrappers'));
@@ -74,6 +75,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
     protected function releaseAll(LockSystem $lockService)
     {
         $sql = $lockService->getStorage()->getPersistence();
+
         $result = $sql->query('SELECT '.SqlStorage::FIELD_OWNER.','.SqlStorage::FIELD_RESOURCE.' FROM '.SqlStorage::TABLE_NAME);
         $locked = $result->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($locked as $data) {
