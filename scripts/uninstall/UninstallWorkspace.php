@@ -35,8 +35,8 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
 
     public function __invoke($params)
     {
-        $lock = $this->getServiceManager()->get(LockSystemInterface::SERVICE_ID);
-        if (!$lock->getSubService() instanceof LockSystem) {
+        $lock = $this->getServiceManager()->get(LockSystemInterface::SERVICE_ID)->getOption('config');
+        if (!$lock instanceof LockSystem) {
             throw new \common_exception_InconsistentData('Expected Workspace Lock not found, found '.get_class($lock));
         }
 
