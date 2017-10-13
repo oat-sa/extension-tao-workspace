@@ -40,6 +40,7 @@ class Updater extends common_ext_ExtensionUpdater
      *
      * @param string $initialVersion
      * @return void
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -90,10 +91,9 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('1.0.0')) {
 
-            $storage = new SqlStorage();
-            $storage->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
-            $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $storage);
-
+            $service = $this->getServiceManager()->get(SqlStorage::SERVICE_ID);
+            $service->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
+            $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $service);
             $this->setVersion('1.1.0');
         }
 
