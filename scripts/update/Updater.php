@@ -22,6 +22,7 @@ namespace oat\taoWorkspace\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use core_kernel_persistence_smoothsql_SmoothModel;
+use oat\generis\model\data\DbWrapper;
 use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
@@ -40,6 +41,7 @@ class Updater extends common_ext_ExtensionUpdater
      *
      * @param string $initialVersion
      * @return void
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -91,10 +93,10 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('1.0.0')) {
 
             $storage = new SqlStorage();
-            $storage->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
+            $persistenceId = $this->getServiceManager()->get(DbWrapper::SERVICE_ID)->getOption(DbWrapper::OPTION_PERSISTENCE);
+            $storage->setOption(SqlStorage::OPTION_PERSISTENCE,$persistenceId);
             $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $storage);
-
-            $this->setVersion('1.1.0');
+            $this->setVersion('1.1.1');
         }
 
 
