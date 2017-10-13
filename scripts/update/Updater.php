@@ -27,6 +27,7 @@ use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
 use oat\taoRevision\model\RepositoryService;
 use oat\taoWorkspace\model\generis\WrapperModel;
+use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 use oat\taoWorkspace\model\RevisionWrapper;
 /**
  * 
@@ -39,6 +40,7 @@ class Updater extends common_ext_ExtensionUpdater
      *
      * @param string $initialVersion
      * @return void
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -86,5 +88,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.6.1', '1.0.0');
+
+        if ($this->isVersion('1.0.0')) {
+
+            $service = $this->getServiceManager()->get(SqlStorage::SERVICE_ID);
+            $service->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
+            $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $service);
+            $this->setVersion('1.1.0');
+        }
+
+
     }
 }

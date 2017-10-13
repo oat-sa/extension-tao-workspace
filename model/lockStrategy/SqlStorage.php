@@ -22,17 +22,25 @@ namespace oat\taoWorkspace\model\lockStrategy;
 
 use common_persistence_Manager;
 use core_kernel_classes_Resource;
+use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
 
-class SqlStorage
+class SqlStorage extends ConfigurableService
 {
+    const OPTION_PERSISTENCE = 'persistence';
+
+    const SERVICE_ID = 'taoWorkspace/SqlStorage';
+
+    private static $persistence;
+
     const TABLE_NAME = 'workspace';
     const FIELD_OWNER = 'owner';
     const FIELD_RESOURCE = 'resource';
     const FIELD_WORKCOPY = 'workcopy';
     const FIELD_CREATED = 'created';
     
-    static public function createTable() {
-        $persistence = common_persistence_Manager::getPersistence('default');
+    public static function createTable() {
+        $persistence = self::getPersistence();
         
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
@@ -50,16 +58,23 @@ class SqlStorage
             $persistence->exec($query);
         }
     }
-    
+
     /**
      * @return \common_persistence_SqlPersistence
      */
-    public function getPersistence() {
-        return common_persistence_Manager::getPersistence('default');
+    public static function getPersistence()
+    {
+        if (!self::$persistence) {
+            $self = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+            $persistenceId = $self->getOption(self::OPTION_PERSISTENCE);
+            self::$persistence = common_persistence_Manager::getPersistence($persistenceId);
+
+        }
+        return self::$persistence;
     }
     
-    static public function getMap($userId) {
-        $persistence = common_persistence_Manager::getPersistence('default');
+    public static function getMap($userId) {
+        $persistence = self::getPersistence();
         $query =  'SELECT * FROM '.self::TABLE_NAME.' WHERE '.self::FIELD_OWNER.' = ?';
         $result	= $persistence->query($query, array($userId));
         
@@ -70,25 +85,27 @@ class SqlStorage
         return $map;
     }
     
-    static public function add($userId, core_kernel_classes_Resource $resource, core_kernel_classes_Resource $copy) {
-        $persistence = common_persistence_Manager::getPersistence('default');
+    public static function add($userId, core_kernel_classes_Resource $resource, core_kernel_classes_Resource $copy) {
+        $persistence = self::getPersistence();
 		$query = 'INSERT INTO "'.self::TABLE_NAME.'" ("'.self::FIELD_OWNER.'", "'.self::FIELD_RESOURCE.'", "'.self::FIELD_WORKCOPY.'", "'.self::FIELD_CREATED.'") VALUES (?,?,?,?)';
 		$result = $persistence->exec($query,array($userId, $resource->getUri(), $copy->getUri(), time()));
     }
     
-    static public function remove(Lock $lock) {
-        $persistence = common_persistence_Manager::getPersistence('default');
+    public static function remove(Lock $lock) {
+        $persistence = self::getPersistence();
         $query = 'DELETE FROM "'.self::TABLE_NAME.'" WHERE "'.self::FIELD_OWNER.'" = ? AND "'.self::FIELD_RESOURCE.'" = ?';
         $result = $persistence->exec($query,array($lock->getOwnerId(), $lock->getResource()->getUri()));
     }
 
     /**
-     * @param Lock
+     * @param core_kernel_classes_Resource $resource
+     * @return mixed|null
+     * @throws \common_exception_InconsistentData
      */
     public function getLock(core_kernel_classes_Resource $resource) {
         
         $query =  'SELECT * FROM '.self::TABLE_NAME.' WHERE '.self::FIELD_RESOURCE.' = ?';
-        $result	= $this->getPersistence()->query($query, array($resource->getUri()));
+        $result	= static::getPersistence()->query($query, array($resource->getUri()));
         
         $locks = array();
         while ($row = $result->fetch()) {
@@ -104,6 +121,4 @@ class SqlStorage
         }
         return count($locks) == 1 ? reset($locks) : null;
     }
-    
-    
 }

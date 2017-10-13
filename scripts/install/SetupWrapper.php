@@ -20,6 +20,7 @@
  */
 namespace oat\taoWorkspace\scripts\install;
 
+use common_persistence_Manager;
 use core_kernel_persistence_smoothsql_SmoothModel;
 use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
@@ -42,8 +43,18 @@ class SetupWrapper extends InstallAction
         SqlStorage::createTable();
 
         $code = 666;
+        $persistence = ModelManager::getModel()->getPersistence();
+
+        /** @var common_persistence_Manager $pm */
+        $pm = $this->getServiceManager()->get(common_persistence_Manager::SERVICE_ID);
+        foreach ($pm->getOption(common_persistence_Manager::OPTION_PERSISTENCES) as $k => $p) {
+            if ($persistence == $pm->getPersistenceById($k)){
+                break;
+            }
+        }
+
         $workspaceModel = new core_kernel_persistence_smoothsql_SmoothModel(array(
-            core_kernel_persistence_smoothsql_SmoothModel::OPTION_PERSISTENCE => 'default',
+            core_kernel_persistence_smoothsql_SmoothModel::OPTION_PERSISTENCE => $k,
             core_kernel_persistence_smoothsql_SmoothModel::OPTION_READABLE_MODELS => array($code),
             core_kernel_persistence_smoothsql_SmoothModel::OPTION_WRITEABLE_MODELS => array($code),
             core_kernel_persistence_smoothsql_SmoothModel::OPTION_NEW_TRIPLE_MODEL => $code,
