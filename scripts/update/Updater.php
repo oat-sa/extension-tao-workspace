@@ -88,17 +88,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('0.6.1');
         }
 
-        $this->skip('0.6.1', '1.0.0');
-
-        if ($this->isVersion('1.0.0')) {
-
-            $storage = new SqlStorage();
-            $persistenceId = ModelManager::getModel()->getOptions('persistence');
-            $storage->setOption(SqlStorage::OPTION_PERSISTENCE,$persistenceId);
-            $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $storage);
-            $this->setVersion('1.1.1');
-        }
-
+        $this->skip('0.6.1', '1.1.1');
 
     }
 }
