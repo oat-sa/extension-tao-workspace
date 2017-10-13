@@ -88,7 +88,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('0.6.1');
         }
 
-        $this->skip('0.6.1', '1.1.1');
+        $this->skip('0.6.1', '1.0.0');
+
+        if ($this->isVersion('1.0.0')) {
+
+            $service = $this->getServiceManager()->get(SqlStorage::SERVICE_ID);
+            $service->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
+            $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $service);
+            $this->setVersion('1.1.1');
+        }
+
 
     }
 }
