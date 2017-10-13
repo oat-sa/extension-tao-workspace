@@ -22,7 +22,6 @@ namespace oat\taoWorkspace\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use core_kernel_persistence_smoothsql_SmoothModel;
-use oat\generis\model\data\DbWrapper;
 use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
