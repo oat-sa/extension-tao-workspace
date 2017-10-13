@@ -93,7 +93,7 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('1.0.0')) {
 
             $storage = new SqlStorage();
-            $persistenceId = $this->getServiceManager()->get(DbWrapper::SERVICE_ID)->getOption(DbWrapper::OPTION_PERSISTENCE);
+            $persistenceId = ModelManager::getModel()->getOptions('persistence');
             $storage->setOption(SqlStorage::OPTION_PERSISTENCE,$persistenceId);
             $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $storage);
             $this->setVersion('1.1.1');
