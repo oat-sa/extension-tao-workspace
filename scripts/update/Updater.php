@@ -94,7 +94,7 @@ class Updater extends common_ext_ExtensionUpdater
             $service = $this->getServiceManager()->get(SqlStorage::SERVICE_ID);
             $service->setOption(SqlStorage::OPTION_PERSISTENCE,'default');
             $this->getServiceManager()->register(SqlStorage::SERVICE_ID, $service);
-            $this->setVersion('1.1.1');
+            $this->setVersion('1.1.0');
         }
 
 
