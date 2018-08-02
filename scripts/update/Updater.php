@@ -24,6 +24,7 @@ use common_ext_ExtensionUpdater;
 use core_kernel_persistence_smoothsql_SmoothModel;
 use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
+use oat\tao\model\Tree\GenerisTreeFactoryBuilderService;
 use oat\taoRevision\model\Repository;
 use oat\taoRevision\model\RepositoryService;
 use oat\taoWorkspace\model\generis\WrapperModel;
@@ -98,5 +99,16 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('1.1.0', '1.1.1');
+
+        if ($this->isVersion('1.1.1')) {
+
+            /** @var GenerisTreeFactoryBuilderService $generisTreeBuilder */
+            $generisTreeBuilder = $this->getServiceManager()->get(GenerisTreeFactoryBuilderService::SERVICE_ID);
+            $generisTreeBuilder->setOption(GenerisTreeFactoryBuilderService::OPTION_SHOW_NO_LABEL_RESOURCES, false);
+
+            $this->getServiceManager()->register(GenerisTreeFactoryBuilderService::SERVICE_ID, $generisTreeBuilder);
+
+            $this->setVersion('1.2.0');
+        }
     }
 }
