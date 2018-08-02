@@ -26,6 +26,7 @@ use oat\generis\model\data\ModelManager;
 use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\oatbox\extension\InstallAction;
 use oat\tao\model\lock\LockManager;
+use oat\tao\model\Tree\GenerisTreeFactoryBuilderService;
 use oat\taoRevision\model\Repository;
 use oat\taoRevision\model\RepositoryService;
 use oat\taoWorkspace\model\generis\WrapperModel;
@@ -38,6 +39,12 @@ use oat\taoWorkspace\model\RevisionWrapper;
  */
 class SetupWrapper extends InstallAction
 {
+    /**
+     * @param $params
+     * @throws \common_Exception
+     * @throws \common_exception_InconsistentData
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     */
     public function __invoke($params)
     {
         SqlStorage::createTable();
@@ -78,5 +85,12 @@ class SetupWrapper extends InstallAction
             RepositoryService::OPTION_FS => 'revisions'
         ));
         $this->registerService(Repository::SERVICE_ID, $newService);
+
+
+        /** @var GenerisTreeFactoryBuilderService $generisTreeBuilder */
+        $generisTreeBuilder = $this->getServiceLocator()->get(GenerisTreeFactoryBuilderService::SERVICE_ID);
+        $generisTreeBuilder->setOption(GenerisTreeFactoryBuilderService::OPTION_SHOW_NO_LABEL_RESOURCES, false);
+
+        $this->getServiceManager()->register(GenerisTreeFactoryBuilderService::SERVICE_ID, $generisTreeBuilder);
     }
 }
