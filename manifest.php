@@ -26,7 +26,7 @@ return array(
     'label' => 'Workspace',
     'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '1.1.2',
+    'version' => '1.1.3',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'generis' => '>=4.4.2',
