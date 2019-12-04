@@ -21,10 +21,11 @@ namespace oat\taoWorkspace\model\generis;
 
 use oat\generis\model\data\Model;
 use common_Logger;
-use \common_exception_MissingParameter;
-use \common_exception_Error;
 use oat\generis\model\data\ModelManager;
 use oat\oatbox\service\ConfigurableService;
+use oat\generis\model\data\Ontology;
+use oat\generis\model\data\RdfInterface;
+use oat\generis\model\data\RdfsInterface;
 
 /**
  * transitory model for the smooth sql implementation
@@ -33,7 +34,7 @@ use oat\oatbox\service\ConfigurableService;
  * @package generis
  */
 class WrapperModel extends ConfigurableService
-    implements Model
+    implements Ontology
 {
     
     static public function wrap(Model $original, Model $workspace ) {
@@ -41,12 +42,12 @@ class WrapperModel extends ConfigurableService
     }
     
     /**
-     * @var oat\generis\model\data\RdfInterface
+     * @var RdfInterface
      */
     private $rdf;
     
     /**
-     * @var oat\generis\model\data\RdfsInterface
+     * @var RdfsInterface
      */
     private $rdfs;
     
