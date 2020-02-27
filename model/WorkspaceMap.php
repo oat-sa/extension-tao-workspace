@@ -20,28 +20,35 @@
 
 namespace oat\taoWorkspace\model;
 
+use common_session_SessionManager;
+use core_kernel_classes_Resource;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
+
 class WorkspaceMap
 {
     private static $current = null;
-    
-    static public function getCurrentUserMap() {
-        $user = \common_session_SessionManager::getSession()->getUser();
-        if (is_null(self::$current) || self::$current->getUserId() != $user->getIdentifier()) {
-            self::$current = new self($user->getIdentifier());
-        }
-        return self::$current;
-    }
-    
+
     private $map;
-    
+
     private $userId;
-    
-    public function __construct($userId) {
+
+    public function __construct($userId)
+    {
         $this->userId = $userId;
         $this->map = SqlStorage::getMap($userId);
     }
-    
+
+    public static function getCurrentUserMap()
+    {
+        $user = common_session_SessionManager::getSession()->getUser();
+
+        if (is_null(self::$current) || self::$current->getUserId() != $user->getIdentifier()) {
+            self::$current = new self($user->getIdentifier());
+        }
+
+        return self::$current;
+    }
+
     public function getUserId()
     {
         return $this->userId;
@@ -52,9 +59,10 @@ class WorkspaceMap
         $this->map = SqlStorage::getMap($this->getUserId());
     }
     
-    public function map(\core_kernel_classes_Resource $resource) {
+    public function map(core_kernel_classes_Resource $resource)
+    {
         return isset($this->map[$resource->getUri()])
-            ? new \core_kernel_classes_Resource($this->map[$resource->getUri()])
+            ? new core_kernel_classes_Resource($this->map[$resource->getUri()])
             : $resource;
     }
 }

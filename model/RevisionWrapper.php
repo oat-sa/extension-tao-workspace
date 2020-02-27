@@ -19,75 +19,98 @@
  */
 namespace oat\taoWorkspace\model;
 
-use core_kernel_classes_Resource;
+use common_exception_Error;
+use common_session_SessionManager;
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoRevision\model\Repository;
+use oat\taoRevision\model\RepositoryInterface;
 use oat\taoRevision\model\Revision;
 use oat\tao\model\lock\LockManager;
-use oat\taoRevision\model\workspace\ApplicableLock;
+use oat\taoRevision\model\RevisionNotFoundException;
+use core_kernel_classes_Resource as Resource;
+use oat\taoWorkspace\model\lockStrategy\ApplicableLockInterface;
 
-class RevisionWrapper extends ConfigurableService implements Repository
+class RevisionWrapper extends ConfigurableService implements RepositoryInterface
 {
-    const OPTION_INNER_IMPLEMENTATION = 'inner';
+    use OntologyAwareTrait;
+
+    public const OPTION_INNER_IMPLEMENTATION = 'inner';
     
     /**
-     * @return Repository
+     * @return RepositoryInterface
      */
     protected function getInner()
     {
         return $this->getServiceLocator()->get($this->getOption(self::OPTION_INNER_IMPLEMENTATION));
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see \oat\taoRevision\model\Repository::getRevisions()
+     * @param string $resourceId
+     *
+     * @return Revision[]
      */
-    public function getRevisions($resourceId)
+    public function getAllRevisions(string $resourceId)
     {
-        return $this->getInner()->getRevisions($resourceId);
+        return $this->getInner()->getAllRevisions($resourceId);
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see \oat\taoRevision\model\Repository::getRevision()
+     * @param string $resourceId
+     * @param int    $version
+     *
+     * @return Revision
+     * @throws RevisionNotFoundException
      */
-    public function getRevision($resourceId, $version)
+    public function getRevision(string $resourceId, int $version)
     {
         return $this->getInner()->getRevision($resourceId, $version);
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see \oat\taoRevision\model\Repository::commit()
+     * @param Resource    $resource
+     * @param string      $message
+     * @param int|null    $version
+     * @param string|null $userId
+     *
+     * @return Revision
+     * @throws common_exception_Error
      */
-    public function commit($resourceId, $message, $version = null)
+    public function commit(Resource $resource, string $message, int $version = null, string $userId = null)
     {
-        $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+        $userId = common_session_SessionManager::getSession()->getUser()->getIdentifier();
+
         if (is_null($userId)) {
             throw new \common_exception_Error('Anonymous User cannot commit resources');
         }
+
         $lockManager = LockManager::getImplementation();
-        $resource = new \core_kernel_classes_Resource($resourceId);
+
         if ($lockManager->isLocked($resource)) {
-            if ($lockManager instanceof ApplicableLock) {
+            if ($lockManager instanceof ApplicableLockInterface) {
                 $lockManager->apply($resource, $userId, true);
             }
         }
-        return $this->getInner()->commit($resourceId, $message, $version);
+
+        return $this->getInner()->commit($resource, $message, $version);
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see \oat\taoRevision\model\Repository::restore()
+     * @param Revision $revision
+     *
+     * @return bool
+     * @throws common_exception_Error
      */
     public function restore(Revision $revision)
     {
+        $resource = $this->getResource($revision->getResourceId());
+
         $lockManager = LockManager::getImplementation();
-        $resource = new \core_kernel_classes_Resource($revision->getResourceId());
+
         if ($lockManager->isLocked($resource)) {
-            $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+            $userId = common_session_SessionManager::getSession()->getUser()->getIdentifier();
             $lockManager->releaseLock($resource, $userId);
         }
+
         return $this->getInner()->restore($revision);
     }
 }
