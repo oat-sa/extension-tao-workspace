@@ -26,12 +26,12 @@ return array(
     'label' => 'Workspace',
     'description' => 'Supports workspaces for items',
     'license' => 'GPL-2.0',
-    'version' => '1.1.3',
+    'version' => '1.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'generis' => '>=4.4.2',
         'taoItems' => '>=2.6.3',
-        'taoRevision' => '>=2.2.0'
+        'taoRevision' => '>=8.0.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoWorkspaceManager',
     'acl' => array(
