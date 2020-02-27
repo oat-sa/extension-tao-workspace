@@ -49,11 +49,11 @@ class Updater extends common_ext_ExtensionUpdater
         }
         
         if ($this->isVersion('0.2')) { 
-            $oldRepository = $this->getServiceManager()->get(Repository::SERVICE_ID);
+            $oldRepository = $this->getServiceManager()->get(RepositoryService::SERVICE_ID);
             $this->getServiceManager()->register('taoWorkspace/innerRevision', $oldRepository);
             
             $newService = new RevisionWrapper(array(RevisionWrapper::OPTION_INNER_IMPLEMENTATION => 'taoWorkspace/innerRevision'));
-            $this->getServiceManager()->register(Repository::SERVICE_ID, $newService);
+            $this->getServiceManager()->register(RepositoryService::SERVICE_ID, $newService);
             $this->setVersion('0.3.0');
         }
 
@@ -61,9 +61,9 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('0.4.1')) {
 
-            $service = $this->getServiceManager()->get(Repository::SERVICE_ID);
-            $service->setOption(RepositoryService::OPTION_FS, 'revisions');
-            $this->getServiceManager()->register(Repository::SERVICE_ID, $service);
+            $service = $this->getServiceManager()->get(RepositoryService::SERVICE_ID);
+            $service->setOption(RepositoryService::OPTION_FILE_SYSTEM, 'revisions');
+            $this->getServiceManager()->register(RepositoryService::SERVICE_ID, $service);
 
             $this->setVersion('0.5.0');
         }
@@ -97,6 +97,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.1.0');
         }
 
-        $this->skip('1.1.0', '1.1.3');
+        $this->skip('1.1.0', '1.2.0');
     }
 }

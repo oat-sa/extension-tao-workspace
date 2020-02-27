@@ -20,16 +20,17 @@
 
 namespace oat\taoWorkspace\model\lockStrategy;
 
-use oat\taoRevision\helper\CloneHelper;
+use common_exception_InconsistentData;
 use core_kernel_classes_Resource;
+use oat\generis\model\data\Model;
 use oat\generis\model\data\ModelManager;
 use common_Utils;
+use oat\oatbox\service\ServiceManager;
+use oat\taoRevision\model\TriplesManagerService;
 use oat\taoWorkspace\model\generis\WrapperModel;
 use \oat\tao\model\lock\LockSystem as LockSystemInterface;
 use oat\oatbox\Configurable;
 use oat\taoWorkspace\model\WorkspaceMap;
-use oat\taoRevision\helper\DeleteHelper;
-use oat\taoRevision\model\workspace\ApplicableLock;
 use oat\tao\model\lock\ResourceLockedException;
 
 /**
@@ -38,10 +39,10 @@ use oat\tao\model\lock\ResourceLockedException;
  * @note It would be preferably static but we may want to have the polymorphism on lock but it would be prevented by explicit class method static calls.
  * Also if you nevertheless call it statically you may want to avoid the late static binding for the getLockProperty
  */
-class LockSystem extends Configurable
-    implements LockSystemInterface, ApplicableLock
+class LockSystem extends Configurable implements LockSystemInterface, ApplicableLockInterface
 {
-    public function getStorage() {
+    public function getStorage()
+    {
         return new SqlStorage();
     }
     
@@ -122,14 +123,16 @@ class LockSystem extends Configurable
 	    }
 
 	    \common_Logger::i('Applying changes to '.$resource->getUri());
-	     
+
+        /** @var TriplesManagerService $triplesManager */
+        $triplesManager = $this->getTriplesManagerService();
+
 	    $innerModel = $this->getInnerModel();
-	    $triples = $innerModel->getRdfsInterface()->getResourceImplementation()->getRdfTriples($resource);
-	    // bypasses the wrapper
-	    DeleteHelper::deepDeleteTriples($triples);
-	    
+
+        $triplesManager->deleteTriplesFor($resource, $innerModel);
+
 	    $triples = $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->getRdfTriples($lock->getWorkCopy());
-	    $clones = CloneHelper::deepCloneTriples($triples);
+	    $clones = $triplesManager->cloneTriples($triples);
 	    
 	    foreach ($clones as $triple) {
 	        $triple->modelid = $innerModel->getNewTripleModelId();
@@ -142,12 +145,12 @@ class LockSystem extends Configurable
 	    }
     }
     
-    protected function release(Lock $lock) {
-
+    protected function release(Lock $lock)
+    {
         $workCopy = $lock->getWorkCopy();
 
         // deletes the dependencies
-        DeleteHelper::deepDelete($workCopy, $this->getWorkspaceModel());
+        $this->getTriplesManagerService()->deleteTriplesFor($workCopy, $this->getWorkspaceModel());
 
         // deletes the workCopy
         $this->getWorkspaceModel()->getRdfsInterface()->getResourceImplementation()->delete($workCopy);
@@ -158,8 +161,9 @@ class LockSystem extends Configurable
         return true;
     }
     
-    protected function deepClone(core_kernel_classes_Resource $source) {
-        $clonedTriples = CloneHelper::deepCloneTriples($source->getRdfTriples());
+    protected function deepClone(core_kernel_classes_Resource $source)
+    {
+        $clonedTriples = $this->getTriplesManagerService()->cloneTriples($source->getRdfTriples());
         $newUri = common_Utils::getNewUri();
         
         $wsModel = $this->getWorkspaceModel();
@@ -173,14 +177,13 @@ class LockSystem extends Configurable
     }
 
     /**
-     * 
-     * @throws \common_exception_InconsistentData
-     * @return oat\generis\model\data\Model
+     * @return Model
+     * @throws common_exception_InconsistentData
      */
     private function getInnerModel() {
         $model = ModelManager::getModel();
         if (!$model instanceof WrapperModel) {
-            throw new \common_exception_InconsistentData('Unexpected ontology model');
+            throw new common_exception_InconsistentData('Unexpected ontology model');
         }
         return $model->getInnerModel();
     }
@@ -200,5 +203,10 @@ class LockSystem extends Configurable
             throw new \common_exception_InconsistentData('Unexpected workspace model'.get_class($wsModel));
         } 
         return $wsModel;
+    }
+
+    protected function getTriplesManagerService()
+    {
+        return ServiceManager::getServiceManager()->get(TriplesManagerService::SERVICE_ID);
     }
 }
